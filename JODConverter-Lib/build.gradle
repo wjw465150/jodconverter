@@ -21,7 +21,7 @@ apply from: rootDir.canonicalPath + '/.gradle/publish.gradle'
 defaultTasks 'shadowJar'
 
 // jar包的名字
-archivesBaseName = 'jodconverter'
+archivesBaseName = 'jodconverter-all'
 
 group = 'com.github.wjw465150'  //Sonatype上的Issue里填写的`Group Id`,可以跟package路径完全不一样
 version = '2.2.2'
@@ -65,7 +65,7 @@ javadoc {
  
  shadowJar {
    archiveBaseName.set(project.archivesBaseName)
-   archiveClassifier.set('all')
+   archiveClassifier.set('')
    archiveVersion.set(project.version)
  
    relocate 'org.apache', 'inner.org.apache'

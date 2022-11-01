@@ -2,6 +2,10 @@ plugins {
   id 'java'
 }
 
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
+[compileJava, compileTestJava, javadoc]*.options*.encoding = 'UTF-8'
+
 repositories {
   maven { url "https://maven.aliyun.com/nexus/content/groups/public/" }  //优先使用阿里的镜像
   mavenCentral()
