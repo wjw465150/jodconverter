@@ -44,7 +44,7 @@ class Test {
 
       // 创建转换器
       DocumentConverter converter = new OpenOfficeDocumentConverter(con);
-      // 转换文档问html
+      // 转换文档
       converter.convert(inFile, docDocumentFormat, outFile, pdfDocumentFormat);
       
       System.out.println("转换成功!");
