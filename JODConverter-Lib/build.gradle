@@ -1,0 +1,157 @@
+////打包: 进入此模块目录执行`..\gradlew -x test clean build shadowJar` 成功后发布:`..\gradlew -x test publish -Dorg.gradle.internal.http.socketTimeout=200000 -Dorg.gradle.internal.http.connectionTimeout=200000`
+//然后登录https://oss.sonatype.org/#stagingRepositories来查看,你的提交在未处理前，是`open`状态，然后点击`Close`按钮;然后等一会点击`Release`来发布
+plugins {
+  id 'java-library'
+  id 'maven-publish'
+  id 'signing' //使用signing plugin做数字签名
+  id 'com.github.johnrengelman.shadow' version '7.1.0'
+}
+
+//密码,GPG签名信息在此文件里,格式如下
+/*
+ext.'signing.keyId' = '密钥keyId'
+ext.'signing.password' = '密钥password'
+ext.'signing.secretKeyRingFile' = '私钥keyRingFile路径'
+
+ext.'sonatypeUsername'='sonatype账号'
+ext.'sonatypePassword'='sonatype密码'
+*/
+apply from: rootDir.canonicalPath + '/.gradle/publish.gradle'
+
+defaultTasks 'shadowJar'
+
+// jar包的名字
+archivesBaseName = 'jodconverter'
+
+group = 'com.github.wjw465150'  //Sonatype上的Issue里填写的`Group Id`,可以跟package路径完全不一样
+version = '2.2.2'
+sourceCompatibility = '1.6'
+targetCompatibility = '1.6'
+[compileJava, compileTestJava, javadoc]*.options*.encoding = 'UTF-8'
+
+description = """通过Socket与LibeOffice/OpenOffice通信对各种文件进行格式转换"""
+
+repositories {
+  maven { url "https://maven.aliyun.com/nexus/content/groups/public/" }  //优先使用阿里的镜像
+  mavenCentral()
+}
+
+dependencies {
+  implementation fileTree(dir: 'lib', include: '*.jar')
+}
+
+javadoc {
+  // 防止本地打开中文乱码
+  options.addStringOption("charset", "UTF-8")
+
+  failOnError=false
+  destinationDir = file("${projectDir}/doc-api")
+  title = "${project.archivesBaseName}-${project.version}"
+  includes = ['com/artofsolving/jodconverter/**']
+}
+
+//为项目生成**.jar/**-javadoc.jar/**-sources.jar
+ task javadocJar(type: Jar, dependsOn: [shadowJar]) {
+   from javadoc
+   classifier = 'javadoc'
+ }
+ 
+ task sourcesJar(type: Jar) {
+   from sourceSets.main.allSource
+   classifier = 'sources'
+   
+   duplicatesStrategy = 'EXCLUDE'
+ }
+ 
+ shadowJar {
+   archiveBaseName.set(project.archivesBaseName)
+   archiveClassifier.set('all')
+   archiveVersion.set(project.version)
+ 
+   relocate 'org.apache', 'inner.org.apache'
+   //relocate 'com.sun.star', 'inner.com.sun.star'
+   relocate 'org.slf4j', 'inner.org.slf4j'
+   relocate 'drafts', 'inner.drafts'
+   relocate 'com.thoughtworks.xstream', 'inner.com.thoughtworks.xstream'
+ 
+   exclude 'META-INF/maven/**'
+   exclude 'META-INF/LICENSE*'
+   exclude 'META-INF/NOTICE*'
+ 
+   manifest {
+     //<--add
+     attributes "Built-By": "wjw465150@gmail.com"
+     attributes "Build-Name": "${project.archivesBaseName}"
+     attributes "Build-Version": "${project.version}"
+     attributes "Main-Class": "com.artofsolving.jodconverter.cli.ConvertDocument"
+     
+   }
+ 
+   dependsOn javadoc
+ }
+ 
+ publishing {
+   // 定义发布什么
+   publications {
+     mavenJava(MavenPublication) {
+       // groupId,artifactId,version，如果不定义，则会按照默认值执行
+       groupId = project.group
+       artifactId = project.archivesBaseName
+       version = project.version
+ 
+       from components.java
+       artifact sourcesJar
+       artifact javadocJar
+ 
+       pom {
+         // 构件名称
+         // 区别于artifactId，可以理解为artifactName
+         name = project.archivesBaseName
+         // 构件描述
+         description = project.description
+         // 构件主页
+         url = 'https://github.com/wjw465150/jodconverter'
+         // 许可证名称和地址
+         licenses {
+           license {
+             name = 'The Apache License, Version 2.0'
+             url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+             distribution = project.description
+           }
+         }
+         // 开发者信息
+         developers {
+           developer {
+             id = 'wjw465150'
+             name = 'wjw465150'
+             email = 'wjw465150@gmail.com'
+           }
+         }
+         // 版本控制仓库地址
+         scm {
+           url = "https://github.com/wjw465150/jodconverter"
+           connection = "https://github.com/wjw465150/jodconverter.git"
+           developerConnection = "https://github.com/wjw465150/jodconverter.git"
+         }
+       }
+     }
+   }
+ 
+   // 定义发布到哪里
+   repositories {
+     maven {
+       url "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+       credentials {
+         // 这里就是之前在issues.sonatype.org注册的账号,这些敏感信息为了防止泄露,我放到了`.gradle/publish.gradle`目录下
+         username sonatypeUsername
+         password sonatypePassword
+       }
+     }
+   }
+ }
+ 
+ //为所有的jar包做数字签名
+ signing {
+   sign publishing.publications.mavenJava
+ }
+ 

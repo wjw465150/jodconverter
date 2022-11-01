@@ -1,0 +1,38 @@
+.gradle
+/build/
+/bin/
+/classes/
+/config-repo/
+!gradle/wrapper/gradle-wrapper.jar
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+nbproject/private/
+build/
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/
+
+# logs
+/test/reports
+/logs
+*.log
+*.log.* 
+
+JODConverter-Lib/doc-api/
+JODConverter-Lib/bin/
+JODConverter-Test/bin/
