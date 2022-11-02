@@ -24,7 +24,7 @@ defaultTasks 'shadowJar'
 archivesBaseName = 'jodconverter-all'
 
 group = 'com.github.wjw465150'  //Sonatype上的Issue里填写的`Group Id`,可以跟package路径完全不一样
-version = '2.2.2'
+version = '4.1.2'
 sourceCompatibility = '1.6'
 targetCompatibility = '1.6'
 [compileJava, compileTestJava, javadoc]*.options*.encoding = 'UTF-8'
@@ -36,8 +36,21 @@ repositories {
   mavenCentral()
 }
 
+def openofficeVersion="4.1.2"
+
 dependencies {
-  implementation fileTree(dir: 'lib', include: '*.jar')
+  //implementation fileTree(dir: 'lib', include: '*.jar')
+  implementation fileTree(dir: 'lib', include: 'commons-cli-1.2.jar')
+  implementation fileTree(dir: 'lib', include: 'commons-io-1.4.jar')
+  implementation fileTree(dir: 'lib', include: 'slf4j-api-1.5.6.jar')
+  implementation fileTree(dir: 'lib', include: 'slf4j-jdk14-1.5.6.jar')
+  implementation fileTree(dir: 'lib', include: 'xstream-1.3.1.jar')
+  
+  implementation "org.openoffice:juh:${openofficeVersion}"
+  implementation "org.openoffice:jurt:${openofficeVersion}"
+  implementation "org.openoffice:ridl:${openofficeVersion}"
+  implementation "org.openoffice:unoil:${openofficeVersion}"
+  
 }
 
 javadoc {
@@ -68,8 +81,8 @@ javadoc {
    archiveClassifier.set('')
    archiveVersion.set(project.version)
  
-   relocate 'org.apache', 'inner.org.apache'
    //relocate 'com.sun.star', 'inner.com.sun.star'
+   relocate 'org.apache', 'inner.org.apache'
    relocate 'org.slf4j', 'inner.org.slf4j'
    relocate 'drafts', 'inner.drafts'
    relocate 'com.thoughtworks.xstream', 'inner.com.thoughtworks.xstream'
