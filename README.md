@@ -81,7 +81,7 @@ java -jar ./jodconverter-all-2.2.2.jar -v -h 127.0.0.1 -p 8100 ./test.doc ./test
 <dependency>
   <groupId>com.github.wjw465150</groupId>
   <artifactId>jodconverter-all</artifactId>
-  <version>2.2.2</version>
+  <version>4.1.2</version>
 </dependency>
 ```
 
@@ -89,7 +89,7 @@ java -jar ./jodconverter-all-2.2.2.jar -v -h 127.0.0.1 -p 8100 ./test.doc ./test
 
 ```groovy
 dependencies {
-  implementation "com.github.wjw465150:jodconverter-all:2.2.2"
+  implementation "com.github.wjw465150:jodconverter-all:4.1.2"
 }
 ```
 
